@@ -1,0 +1,30 @@
+name: stress-ng
+base: core24
+version: nil
+summary: stress-ng will stress test a computer system in various selectable ways
+description: |
+  stress-ng was originally intended to make a machine work hard and trip hardware
+  issues such as thermal overruns as well as operating system bugs that only occur when a system is being thrashed hard.
+  Use stress-ng with caution as some of the tests can make a system run hot on poorly
+  designed hardware and also can cause excessive system thrashing which may be difficult to stop.
+
+grade: stable
+confinement: devmode
+
+package-repositories:
+ - type: apt
+   ppa: colin-king/stress-ng
+
+parts:
+  stress-ng:
+    plugin: nil
+    build-packages:
+      - stress-ng
+    override-build: |
+       craftctl set version=$(stress-ng --version | cut -d ' ' -f 3)-$(git rev-parse --short HEAD)
+    stage-packages:
+      - stress-ng
+
+apps:
+  stress-ng:
+  command: usr/bin/stress-ng
