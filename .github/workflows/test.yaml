@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  SNAP_AMD64: stress-ng_${{ github.run_number}}_amd64.snap
+  SNAP_AMD64: stress-ng_${{ github.run_id}}_amd64.snap
 
 jobs:
   build:
@@ -57,8 +57,21 @@ jobs:
           repository: ColinIanKing/stress-ng
           ref: ${{ steps.get_tag.outputs.tag }}
 
+      - name: Apply patch to run tests from snap
+        run: |
+
+          wget https://raw.githubusercontent.com/locnnil/stress-ng-snap/main/tests/0001-test-running-for-devmode-stress-ng-snap.patch
+          git apply 0001-test-running-for-devmode-stress-ng-snap.patch
+
       - name: Run lite-test
         run: STRESS_NG=/snap/bin/stress-ng debian/tests/lite-test
 
       - name: Run fast-test-all
         run: STRESS_NG=/snap/bin/stress-ng debian/tests/fast-test-all
+
+      - name: Run verify-test-all
+        run: make verify-test-all
+
+      - name: Run slow-test-all
+        run: make slow-test-all
+
